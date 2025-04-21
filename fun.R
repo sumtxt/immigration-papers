@@ -193,15 +193,19 @@ add_openai_embedding <- function(data) {
     str <- paste0(data$title, "\n", ifelse(is.na(data$abstract), "", data$abstract))
     data$vec <- lapply(str, function(x) get_openai_embedding(x))
     return(data)
-}
+    }
 
 add_yardstick_distance <- function(data, yardstick_file = "./parameters/yardstick.json") {
     yardstick <- fromJSON(yardstick_file)
-    yardstick <- colMeans(yardstick)
-    data$dist <- cosine_vec(data$vec, yardstick)
+    yardstick <- rbind(yardstick, colMeans(yardstick))
+    data$dist <- get_cosine(data$vec, yardstick)
     return(data)
+    }
+
+max_cosine <- function(vector, matrix){
+    max(apply(matrix, 1, function(x) cosine(x, vector)))
 }
 
-cosine_vec <- function(list_of_vec, vec) {
-    return(unlist(lapply(list_of_vec, function(x) cosine(x, vec))))
+get_cosine <- function(list_of_vectors, matrix){ 
+    unlist(lapply(list_of_vectors, function(x) max_cosine(x, matrix)))
 }
