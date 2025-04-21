@@ -5,11 +5,13 @@ library(coop)
 source("fun.R")
 source("credentials.R")
 
+s <- NULL 
+
 update_date <- get_paper_picnic_update_date()
 # check_update_date(update_date)
 
 # Crawl Paper Picnic 
-pubs <- get_paper_picnic(sample=2)$content |> 
+pubs <- get_paper_picnic(sample=s)$content |> 
     add_openai_embedding() |> 
     add_yardstick_distance()
 
@@ -23,7 +25,7 @@ pubs <- within(pubs, {
 })
 
 # Crawl Preprint Picnic  
-preprints <- get_preprint_picnic(sample=2)$content |> 
+preprints <- get_preprint_picnic(sample=s)$content |> 
     add_openai_embedding() |> 
     add_yardstick_distance()
 
