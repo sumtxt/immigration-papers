@@ -1,0 +1,57 @@
+<p></p>
+<div class="container">
+    {% for article in data_crawl %}
+
+    {% if article.preprint == true %}
+        <div class="collapse" id="collapse-preprint">
+    {% elsif article.specialized == true %}
+        <div class="collapse" id="collapse-specialized">
+    {% else %}
+        <div class="collapse show" id="collapse-general">
+    {% endif %}
+
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-11">
+            <div class="card" id="article-card">
+                <div class="card-body">
+                <h5 class="card-title">{{ article.title }}
+                    {% if article.dist != nil %}
+                    <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-secondary">{{ article.dist  | times: 100 | round: 1 }}</span>
+                    {% endif %}
+                </h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ article.authors }}</h6>
+                {% if article.preprint == false %}
+                    {% if article.specialized == true %}
+                        <h6 class="card-subtitle mb-2 text-muted">✨ <em>{{ article.journal_full }}</em></h6>
+                    {% else %}
+                        <h6 class="card-subtitle mb-2 text-muted">📚 <em>{{ article.journal_full }}</em></h6>
+                    {% endif %}
+                {% else %}
+                <h6 class="card-subtitle mb-2 text-muted">🔥 Preprint</h6>
+                {% endif %}
+                {% if article.abstract != nil %}
+                <button class="btn btn-light btn-sm rounded-pill" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#{{ article.doi }}" aria-expanded="false"
+                    aria-controls="{{ article.doi }}">Abstract</button>
+                {% else %}
+                <button class="btn btn-light btn-sm rounded-pill" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#{{ article.doi }}" aria-expanded="false" aria-controls="{{ article.doi }}"
+                    disabled>Abstract</button>
+                {% endif %}
+                <a href="{{ article.url }}" target="_blank" class="btn btn-light btn-sm rounded-pill">Full text</a>
+                <div class="collapse collapse-article" id="{{ article.doi }}">
+                    <div class="card-text">
+                    {{ article.abstract }}
+                    </div>
+                </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    
+        </div>  
+
+    {% endfor %}
+</div>
+
