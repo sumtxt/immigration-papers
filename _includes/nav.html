@@ -1,6 +1,6 @@
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+<nav class="navbar fixed-top navbar-expand-lg bg-dark" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">{{ site.title }}
+        <a class="navbar-brand" href="{{ site.baseurl }}/">{{ site.title }}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,24 +9,30 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Dashboard</a>
+                  <a {% if page.url=="/dashboard.html" %}class="nav-link active" {% else %}class="nav-link" {%
+                    endif %} href="./dashboard">Dashboard</a>
                 </li>
               </ul>
+            {% if page.url=="/dashboard.html" %}
             <div class="form-check form-switch ms-3">
                 <input class="form-check-input" type="checkbox" id="navbarSwitch" data-bs-toggle="collapse" data-bs-target="#collapse-general" aria-expanded="true" aria-controls="collapse-general" checked>
-                <label class="form-check-label text-light" for="navbarSecondSwitch">📚 General journals</label>
+                <span data-bs-toggle="tooltip" data-bs-placement="bottom"  title="Add or remove publications from social science journals not specialized in migration.">
+                    <label class="form-check-label text-light" for="navbarSecondSwitch">📚 General journals</label>
+                </span>
             </div>
                 <div class="form-check form-switch ms-3">
                 <input class="form-check-input" type="checkbox" id="navbarSwitch" data-bs-toggle="collapse" data-bs-target="#collapse-specialized" aria-expanded="false" aria-controls="collapse-specialized">
-                <label class="form-check-label text-light" for="navbarSecondSwitch">✨ Field journals</label>
+                <span data-bs-toggle="tooltip" data-bs-placement="bottom"  title="Add or remove publications from journals specialized in migration (e.g., International Migration Review).">
+                    <label class="form-check-label text-light" for="navbarSecondSwitch">✨ Field journals</label>
+                </span>
             </div>
             <div class="form-check form-switch ms-3">
                 <input class="form-check-input" type="checkbox" id="navbarSwitch" data-bs-toggle="collapse" data-bs-target="#collapse-preprint" aria-expanded="false" aria-controls="collapse-preprint">
-                <label class="form-check-label text-light" for="navbarSwitch">🔥 Preprints</label>
+                <span data-bs-toggle="tooltip" data-bs-placement="bottom"  title="Add or remove preprints from OSF preprint providers such as SocArXiv.">
+                    <label class="form-check-label text-light" for="navbarSwitch">🔥 Preprints</label>
+                </span>
             </div>
-              <span class="navbar-text ms-3">
-                Data update: {{ site.data.update_date | date: "%Y-%m-%d" }}
-            </span>        
+            {% endif %}
         </div>
     </div>
 </nav>

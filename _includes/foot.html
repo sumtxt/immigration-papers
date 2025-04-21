@@ -1,5 +1,6 @@
-<footer class="mt-auto">
-<div class="mt-auto py-3 text-center">
-<small></small>
+<div class="fixed-bottom mt-auto bg-dark">
+    <div class="mt-auto py-1 text-center text-light">
+        <small>Data updated on {{ site.data.meta.update_date | date: "%B %d" }}. Next data update on {{
+            site.data.meta.update_date | date: '%s' | plus: 604800 | date: "%B %d" }}.</small>
+    </div>
 </div>
-</footer>
