@@ -4,10 +4,15 @@
 
 <body>
     {% include nav.html %}
-    <main class="container" style="max-width: 750px; padding-top: 5rem;">
+    <main class="container" style="max-width: 750px; padding-top: 7.5rem; padding-bottom: 2.5rem">
         <div class="row">
             <div class="col-12">
                 
+                <figure class="figure">
+                    <img src="{{ page.image }}" class="figure-img img-fluid rounded" alt="...">
+                    <figcaption class="figure-caption text-end">sora.chatgpt.com</figcaption>
+                </figure>
+
                 {{ content}}
 
             </div>
