@@ -10,6 +10,8 @@ s <- NULL
 update_date <- get_paper_picnic_update_date()
 # check_update_date(update_date)
 
+journal_count <- get_paper_picnic_journal_count()
+
 # Crawl Paper Picnic 
 pubs <- get_paper_picnic(sample=s)$content |> 
     add_openai_embedding() |> 
@@ -44,4 +46,5 @@ preprints <- within(preprints, {
 papers <- rbind(pubs[,colnames(pubs)], preprints[,colnames(pubs)])
 write(toJSON(papers), file="./output/papers.json")
 
-write(toJSON(update_date), file="./output/update_date.json")
+meta <- list(update_date=update_date, journal_count=journal_count)
+write(toJSON(meta,auto_unbox=TRUE), file="./output/meta.json")

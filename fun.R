@@ -126,6 +126,28 @@ get_paper_picnic_update_date <- function(){
     return(update_date)
     }
 
+
+get_paper_picnic_journal_count <- function(){ 
+
+    files <- paste0("https://paper-picnic.com/json/", c(
+        "politics_journals.json",
+        "communication_journals.json",
+        "economics_journals.json",
+        "migration_journals.json",
+        "multidisciplinary_journals.json",
+        "public_administration_and_policy_journals.json",
+        "sociology_journals.json"
+    ))
+
+    count <- 0
+    for (file in files) {
+        count <- count + nrow(fromJSON(file))
+
+    }
+    return(count)
+    }
+
+
 check_update_date <- function(update_date){
 
     if(length(update_date) != 1){
