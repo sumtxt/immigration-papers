@@ -2,7 +2,7 @@ title: "Immigration Papers"
 email: "immigration-paper-dashboard@moritz-marbach.com"
 author: "Moritz Marbach"
 description: "A weekly digest with the latest research on immigration."
-baseurl: ""
+baseurl: "https://www.moritz-marbach.com/immigration-papers"
 url: "https://www.moritz-marbach.com/immigration-papers"
 github_username: "sumtxt"
 exclude: 
