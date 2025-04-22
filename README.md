@@ -1,4 +1,4 @@
-Immigration Paper
+Immigration Papers
 ===================
 
 Immigration Papers offers a weekly dashboard showcasing newly published research on immigration in political science, sociology, and economics. The process is fully automated and scheduled using GitHub Actions. Data is sourced from [paper-picnic.com](https://paper-picnic.com/), which queries the Crossref API to track recent publications across more than 60 journals in political science and related fields.
