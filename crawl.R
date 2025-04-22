@@ -5,7 +5,7 @@ library(coop)
 source("fun.R")
 source("credentials.R")
 
-s <- NULL 
+s <- NULL
 
 update_date <- get_paper_picnic_update_date()
 # check_update_date(update_date)
@@ -43,8 +43,14 @@ preprints <- within(preprints, {
     vec <- NULL
 })
 
+# Output to public dashboard
 papers <- rbind(pubs[,colnames(pubs)], preprints[,colnames(pubs)])
 write(toJSON(papers), file="./output/papers.json")
 
 meta <- list(update_date=update_date, journal_count=journal_count)
 write(toJSON(meta,auto_unbox=TRUE), file="./output/meta.json")
+
+# Post Top 10 to Slack 
+papers <- papers[order(-1*papers$dist),][1:10,]
+papers <- subset(papers, select=c("title", "authors", "abstract", "url"))
+all_papers_to_slack(papers)

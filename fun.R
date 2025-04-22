@@ -209,3 +209,42 @@ max_cosine <- function(vector, matrix){
 get_cosine <- function(list_of_vectors, matrix){ 
     unlist(lapply(list_of_vectors, function(x) max_cosine(x, matrix)))
 }
+
+#################
+#################
+# Post to Slack #
+#################
+#################
+
+paper_to_slack <- function(paper) {
+    response <- POST(
+        url = .slack_workflow_trigger_url,
+        body = toJSON(paper, auto_unbox = TRUE),
+        add_headers(`Content-Type` = "application/json")
+    )
+
+    return(response)
+}
+
+all_papers_to_slack <- function(papers, wait_in_seconds = 2, rate_limit_per_minute = 10) {
+    start_time <- Sys.time()
+
+    N <- nrow(papers)
+
+    for (i in 1:N) {
+        cat(".")
+        paper <- as.vector(papers[i, ])
+        response <- content(paper_to_slack(paper))
+
+        if (response$ok != TRUE) stop("Error in posting to Slack: ", response)
+
+        if (i %% rate_limit_per_minute == 0) {
+            elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+            remaining_time <- max(0, 60 - elapsed_time)
+            Sys.sleep(remaining_time)
+            start_time <- Sys.time()
+        } else {
+            Sys.sleep(wait_in_seconds)
+        }
+    }
+}
