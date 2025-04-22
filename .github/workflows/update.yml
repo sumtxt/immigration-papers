@@ -1,4 +1,4 @@
-name: Update
+name: Update dashboard
 
 on: 
    workflow_dispatch:
