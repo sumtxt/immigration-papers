@@ -1,4 +1,4 @@
-name: Crawl
+name: Crawl data
 
 on: 
    workflow_dispatch:
@@ -30,9 +30,11 @@ jobs:
         working-directory: ./main_folder
         run: |
           echo 'openai_apikey="'"$MAPPED_OPENAI_APIKEY"'"' >> credentials.R
+          echo '.slack_workflow_trigger_url="'"$MAPPED_SLACK_WEBHOOK"'"' >> credentials.R
         shell: bash
         env:
           MAPPED_OPENAI_APIKEY : ${{ secrets.OPENAI_APIKEY }}
+          MAPPED_SLACK_WEBHOOK : ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Get data and produce JSON
         working-directory: ./main_folder
