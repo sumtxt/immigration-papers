@@ -18,7 +18,6 @@ jobs:
           packages: |
             any::httr 
             any::jsonlite 
-            any::rvest
             any::coop
 
       - name: Check out repository
