@@ -178,12 +178,13 @@ get_openai_embedding <- function(input,
         input = input
     )
     body <- toJSON(body, auto_unbox = TRUE)
-    res <- POST(endpoint,
+    res <- RETRY("POST",
+        url=endpoint, 
         body = body,
         encode = "raw",
         content_type_json(),
-        add_headers(Authorization = paste("Bearer", openai_apikey, sep = " "))
-    )
+        add_headers(Authorization = paste("Bearer", openai_apikey, sep = " ")),
+        pause_base=5)
 
     res <- content(res)
     return(unlist(res$data[[1]]$embedding))
