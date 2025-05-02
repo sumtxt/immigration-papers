@@ -8,7 +8,7 @@ source("credentials.R")
 s <- NULL
 
 update_date <- get_paper_picnic_update_date()
-# check_update_date(update_date)
+check_update_date(update_date)
 
 journal_count <- get_paper_picnic_journal_count()
 
