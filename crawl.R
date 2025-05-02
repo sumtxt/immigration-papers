@@ -51,6 +51,7 @@ meta <- list(update_date=update_date, journal_count=journal_count)
 write(toJSON(meta,auto_unbox=TRUE), file="./output/meta.json")
 
 # Post Top 10 to Slack 
-# papers <- papers[1:10,]
-# papers <- subset(papers, specialized==FALSE & preprint==FALSE, select=c("title", "authors", "abstract", "url"))
-# all_papers_to_slack(papers)
+papers <- papers[order(-1*papers$dist),]
+papers <- subset(papers, specialized==FALSE & preprint==FALSE, select=c("title", "authors", "abstract", "url"))
+papers <- papers[1:10,]
+all_papers_to_slack(papers)
