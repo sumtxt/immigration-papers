@@ -48,6 +48,7 @@ jobs:
           pip install setfit
 
       - name: Run inference script
+        working-directory: ./main_folder
         run: python rank.py
 
       # - name: Post to Slack
