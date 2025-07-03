@@ -1,0 +1,6 @@
+pandas
+datasets
+setfit
+scikit-learn
+torch
+transformers

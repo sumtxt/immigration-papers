@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Data Viewer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general layout */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 16px; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .data-field {
+            background-color: #f9fafb; /* Lighter background for fields */
+            border: 1px solid #e5e7eb;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        .data-field h3 {
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 1.125rem; /* text-lg */
+        }
+        .data-field p {
+            color: #4b5563;
+            white-space: pre-wrap; /* Wrap long lines */
+            word-break: break-word; /* Break words to prevent overflow */
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        .btn-yes {
+            background-color: #10b981; /* Emerald */
+            color: white;
+        }
+        .btn-yes:hover {
+            background-color: #059669; /* Darker emerald */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .btn-no {
+            background-color: #ef4444; /* Red */
+            color: white;
+        }
+        .btn-no:hover {
+            background-color: #dc2626; /* Darker red */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .btn-exclude {
+            background-color: #6b7280; /* Gray */
+            color: white;
+        }
+        .btn-exclude:hover {
+            background-color: #4b5563; /* Darker gray */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .btn-download {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            margin-top: 20px;
+        }
+        .btn-download:hover {
+            background-color: #2563eb; /* Darker blue */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .btn:disabled {
+            background-color: #d1d5db; /* Light gray for disabled */
+            color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        input[type="file"] {
+            display: none; /* Hide default file input */
+        }
+        .custom-file-upload {
+            display: inline-block;
+            padding: 12px 24px;
+            cursor: pointer;
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .custom-file-upload:hover {
+            background-color: #4338ca; /* Darker indigo */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .message-box {
+            background-color: #fee2e2; /* Red-ish background for error */
+            color: #991b1b; /* Dark red text */
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #ef4444;
+            display: none; /* Hidden by default */
+            font-size: 0.9rem;
+        }
+        .message-box.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800">Journal Article Coding</h1>
+        <p class="text-gray-600">Upload a JSON file to view its contents and make decisions.</p>
+
+        <label for="jsonFile" class="custom-file-upload">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M.5 8a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5zM3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4zm1 0v8h12V4H4zm1 1h10v6H5V5z" clip-rule="evenodd" />
+            </svg>
+            Upload JSON File
+        </label>
+        <input type="file" id="jsonFile" accept=".json">
+
+        <div id="messageBox" class="message-box" role="alert"></div>
+
+        <div class="button-group">
+            <button id="yesBtn" class="btn btn-yes" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Yes
+            </button>
+            <button id="noBtn" class="btn btn-no" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                No
+            </button>
+            <button id="excludeBtn" class="btn btn-exclude" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a1 1 0 011-1h10a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                </svg>
+                Exclude
+            </button>
+        </div>
+        
+        <div class="data-display-area">
+            <p id="dataIndex" class="text-gray-700 text-lg font-semibold mb-4">No file loaded</p>
+            <div id="jsonDataDisplay">
+                <div class="data-field">
+                    <h3>Title:</h3>
+                    <p id="titleDisplay">N/A</p>
+                </div>
+                <div class="data-field">
+                    <h3>Abstract:</h3>
+                    <p id="abstractDisplay">N/A</p>
+                </div>
+                <div class="data-field">
+                    <h3>Journal Full:</h3>
+                    <p id="journalFullDisplay">N/A</p>
+                </div>
+            </div>
+        </div>
+
+        <button id="downloadBtn" class="btn btn-download" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414zM10 3a1 1 0 011 1v7a1 1 0 11-2 0V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Download Data
+        </button>
+    </div>
+
+    <script>
+        // Global variables to store data and current index
+        let jsonData = [];
+        let currentIndex = 0;
+
+        // Get DOM elements
+        const fileInput = document.getElementById('jsonFile');
+        const titleDisplay = document.getElementById('titleDisplay');
+        const abstractDisplay = document.getElementById('abstractDisplay');
+        const journalFullDisplay = document.getElementById('journalFullDisplay');
+        const dataIndexDisplay = document.getElementById('dataIndex');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const excludeBtn = document.getElementById('excludeBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const messageBox = document.getElementById('messageBox');
+
+        /**
+         * Displays a message in the message box.
+         * @param {string} message - The message to display.
+         * @param {string} type - The type of message ('error', 'success', etc.).
+         */
+        function showMessage(message, type = 'error') {
+            messageBox.textContent = message;
+            messageBox.className = 'message-box show'; // Reset classes and show
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-800', 'border-red-400');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-800', 'border-green-400');
+            }
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 5000);
+        }
+
+        /**
+         * Updates the display with the current JSON data item.
+         */
+        function updateDisplay() {
+            if (jsonData.length === 0 || currentIndex >= jsonData.length) {
+                titleDisplay.textContent = 'N/A';
+                abstractDisplay.textContent = 'N/A';
+                journalFullDisplay.textContent = 'N/A';
+                dataIndexDisplay.textContent = 'No file loaded or all items processed.';
+                yesBtn.disabled = true;
+                noBtn.disabled = true;
+                excludeBtn.disabled = true;
+                downloadBtn.disabled = jsonData.length === 0; // Enable download if data was loaded
+                return;
+            }
+
+            const currentItem = jsonData[currentIndex];
+
+            // Display specific fields
+            titleDisplay.textContent = currentItem.title || 'N/A';
+            abstractDisplay.textContent = currentItem.abstract || 'N/A';
+            journalFullDisplay.textContent = currentItem.journal_full || 'N/A';
+
+            // Update the index counter
+            dataIndexDisplay.textContent = `Item ${currentIndex + 1} of ${jsonData.length}`;
+
+            // Enable decision buttons
+            yesBtn.disabled = false;
+            noBtn.disabled = false;
+            excludeBtn.disabled = false;
+            downloadBtn.disabled = false;
+        }
+
+        /**
+         * Handles a decision (Yes, No, Exclude) for the current item.
+         * @param {string} decision - The decision made ('yes', 'no', 'exclude').
+         */
+        function handleDecision(decision) {
+            if (currentIndex < jsonData.length) {
+                jsonData[currentIndex].decision = decision; // Add the decision attribute
+                currentIndex++; // Move to the next item
+                updateDisplay(); // Update the UI
+            }
+        }
+
+        /**
+         * Handles the file input change event.
+         * Reads the selected JSON file and parses its content.
+         */
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                jsonData = [];
+                currentIndex = 0;
+                updateDisplay();
+                return;
+            }
+
+            // Ensure the file is a JSON file
+            if (file.type !== 'application/json') {
+                showMessage('Please upload a valid JSON file.', 'error');
+                jsonData = [];
+                currentIndex = 0;
+                updateDisplay();
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                try {
+                    const content = e.target.result;
+                    const parsedData = JSON.parse(content);
+
+                    // Ensure the parsed data is an array
+                    if (!Array.isArray(parsedData)) {
+                        showMessage('JSON file must contain an array of objects.', 'error');
+                        jsonData = [];
+                        currentIndex = 0;
+                        updateDisplay();
+                        return;
+                    }
+
+                    jsonData = parsedData;
+                    currentIndex = 0; // Reset to the first item
+                    updateDisplay();
+                    showMessage(`Successfully loaded ${jsonData.length} items.`, 'success');
+
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                    showMessage('Error parsing JSON file. Please check its format.', 'error');
+                    jsonData = [];
+                    currentIndex = 0;
+                    updateDisplay();
+                }
+            };
+
+            reader.onerror = () => {
+                showMessage('Error reading file.', 'error');
+                jsonData = [];
+                currentIndex = 0;
+                updateDisplay();
+            };
+
+            reader.readAsText(file);
+        });
+
+        // Event listeners for decision buttons
+        yesBtn.addEventListener('click', () => handleDecision('yes'));
+        noBtn.addEventListener('click', () => handleDecision('no'));
+        excludeBtn.addEventListener('click', () => handleDecision('exclude'));
+
+        /**
+         * Handles the download button click.
+         * Creates a JSON file from the current data and triggers a download.
+         */
+        downloadBtn.addEventListener('click', () => {
+            if (jsonData.length === 0) {
+                showMessage('No data to download. Please load a JSON file first.', 'error');
+                return;
+            }
+
+            const dataStr = JSON.stringify(jsonData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ml_training_data_with_decisions.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showMessage('Data downloaded successfully!', 'success');
+        });
+
+        // Initial display update when the page loads
+        updateDisplay();
+    </script>
+</body>
+</html>

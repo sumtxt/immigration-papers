@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Processor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        /* Custom scrollbar for table container */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #e2e8f0; /* Light track */
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* Gray thumb */
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Darker gray on hover */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-4xl">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">JSON Data Processor</h1>
+
+        <!-- File Upload Section -->
+        <div class="mb-6 border-b pb-4 border-gray-200">
+            <label for="jsonFile" class="block text-lg font-medium text-gray-700 mb-2">Upload JSON File:</label>
+            <input type="file" id="jsonFile" accept=".json" class="block w-full text-sm text-gray-900
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100
+                cursor-pointer rounded-lg border border-gray-300 p-2">
+            <p id="uploadMessage" class="mt-2 text-sm text-gray-600"></p>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="flex flex-col sm:flex-row justify-between items-start mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
+            <!-- Filter Dropdowns -->
+            <div class="w-full sm:w-1/2 flex flex-col space-y-3">
+                <div>
+                    <label for="specializedFilter" class="block text-sm font-medium text-gray-700 mb-1">Specialized:</label>
+                    <select id="specializedFilter"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none
+                        focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm bg-white cursor-pointer" disabled>
+                        <option value="showAll">Show All</option>
+                        <option value="exclude">Exclude Specialized</option>
+                        <option value="includeOnly">Show Only Specialized</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="preprintsFilter" class="block text-sm font-medium text-gray-700 mb-1">Preprints:</label>
+                    <select id="preprintsFilter"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none
+                        focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm bg-white cursor-pointer" disabled>
+                        <option value="showAll">Show All</option>
+                        <option value="exclude">Exclude Preprints</option>
+                        <option value="includeOnly">Show Only Preprints</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="abstractFilter" class="block text-sm font-medium text-gray-700 mb-1">Abstract:</label>
+                    <select id="abstractFilter"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none
+                        focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm bg-white cursor-pointer" disabled>
+                        <option value="showAll">Show All</option>
+                        <option value="includeOnlyPresent">Show Only Items with Abstract</option>
+                        <option value="excludePresent">Exclude all items with Abstract</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="w-full sm:w-1/2">
+                <label for="sortSelect" class="block text-sm font-medium text-gray-700 mb-1">Sort By:</label>
+                <select id="sortSelect"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none
+                    focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm bg-white cursor-pointer" disabled>
+                    <option value="">-- Select Column --</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Item Count and Download Button -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
+            <div class="text-lg font-medium text-gray-700">
+                Items displayed: <span id="itemCount" class="font-bold text-blue-700">0</span>
+            </div>
+            <button id="downloadBtn"
+                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full
+                shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2
+                focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 ease-in-out
+                disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Download Modified JSON
+            </button>
+        </div>
+
+        <!-- Data Table Section -->
+        <div id="tableContainer" class="overflow-x-auto rounded-lg shadow-md table-container max-h-[60vh]">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                    <tr id="tableHeaderRow">
+                        <!-- Table headers will be inserted here by JavaScript -->
+                    </tr>
+                </thead>
+                <tbody id="jsonTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Table rows will be inserted here by JavaScript -->
+                    <tr>
+                        <td colspan="100%" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                            Upload a JSON file to see data here.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let originalData = []; // Stores the initial parsed JSON data
+        let currentData = [];  // Stores the data after filtering/sorting
+        let tableHeaders = []; // Stores the keys from the first object as table headers
+
+        const jsonFileInput = document.getElementById('jsonFile');
+        const uploadMessage = document.getElementById('uploadMessage');
+        const sortSelect = document.getElementById('sortSelect');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const tableHeaderRow = document.getElementById('tableHeaderRow');
+        const jsonTableBody = document.getElementById('jsonTableBody');
+        const itemCountSpan = document.getElementById('itemCount');
+
+        // Filter dropdown elements
+        const specializedFilterSelect = document.getElementById('specializedFilter');
+        const preprintsFilterSelect = document.getElementById('preprintsFilter');
+        const abstractFilterSelect = document.getElementById('abstractFilter');
+
+        /**
+         * Event listener for file input change.
+         * Reads the uploaded JSON file, parses it, and initializes the application.
+         */
+        jsonFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                uploadMessage.textContent = 'No file selected.';
+                uploadMessage.className = 'mt-2 text-sm text-gray-600';
+                resetAppState();
+                return;
+            }
+
+            // Check if the file is a JSON file
+            if (file.type !== 'application/json') {
+                uploadMessage.textContent = 'Please upload a valid JSON file.';
+                uploadMessage.className = 'mt-2 text-sm text-red-600';
+                resetAppState();
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                try {
+                    const json = JSON.parse(e.target.result);
+
+                    // Ensure the JSON is an array of objects
+                    if (!Array.isArray(json) || json.length === 0 || typeof json[0] !== 'object' || json[0] === null) {
+                        uploadMessage.textContent = 'Invalid JSON format. Expected an array of objects.';
+                        uploadMessage.className = 'mt-2 text-sm text-red-600';
+                        resetAppState();
+                        return;
+                    }
+
+                    originalData = json;
+                    currentData = [...originalData]; // Create a shallow copy for current operations
+
+                    // Extract headers from the first object, ensuring unique keys
+                    tableHeaders = Array.from(new Set(originalData.flatMap(obj => Object.keys(obj))));
+
+                    // Enable controls and update message
+                    downloadBtn.disabled = false;
+                    sortSelect.disabled = false;
+                    specializedFilterSelect.disabled = false;
+                    preprintsFilterSelect.disabled = false;
+                    abstractFilterSelect.disabled = false;
+
+                    uploadMessage.textContent = `File "${file.name}" uploaded successfully. Found ${originalData.length} items.`;
+                    uploadMessage.className = 'mt-2 text-sm text-green-600';
+
+                    populateSortDropdown();
+                    applyFiltersAndSort(); // Apply filters and sort immediately after loading
+                    renderTable(currentData);
+
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                    uploadMessage.textContent = `Error parsing JSON file: ${error.message}. Please ensure it's valid JSON.`;
+                    uploadMessage.className = 'mt-2 text-sm text-red-600';
+                    resetAppState();
+                }
+            };
+
+            reader.onerror = () => {
+                uploadMessage.textContent = 'Error reading file.';
+                uploadMessage.className = 'mt-2 text-sm text-red-600';
+                resetAppState();
+            };
+
+            reader.readAsText(file);
+        });
+
+        /**
+         * Resets the application state to its initial blank state.
+         */
+        function resetAppState() {
+            originalData = [];
+            currentData = [];
+            tableHeaders = [];
+            jsonTableBody.innerHTML = `<tr><td colspan="100%" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">Upload a JSON file to see data here.</td></tr>`;
+            tableHeaderRow.innerHTML = '';
+            sortSelect.innerHTML = '<option value="">-- Select Column --</option>';
+            downloadBtn.disabled = true;
+            sortSelect.disabled = true;
+
+            // Reset filter dropdowns
+            specializedFilterSelect.disabled = true;
+            preprintsFilterSelect.disabled = true;
+            abstractFilterSelect.disabled = true;
+            specializedFilterSelect.value = 'showAll';
+            preprintsFilterSelect.value = 'showAll';
+            abstractFilterSelect.value = 'showAll';
+
+            itemCountSpan.textContent = '0'; // Reset item count
+        }
+
+        /**
+         * Populates the sort dropdown with column headers.
+         */
+        function populateSortDropdown() {
+            sortSelect.innerHTML = '<option value="">-- Select Column --</option>'; // Reset options
+            tableHeaders.forEach(header => {
+                const option = document.createElement('option');
+                option.value = header;
+                option.textContent = header;
+                sortSelect.appendChild(option);
+            });
+        }
+
+        /**
+         * Renders the data into the HTML table.
+         * @param {Array<Object>} dataToRender - The array of objects to display.
+         */
+        function renderTable(dataToRender) {
+            // Clear existing table body and header
+            jsonTableBody.innerHTML = '';
+            tableHeaderRow.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                jsonTableBody.innerHTML = `<tr><td colspan="${tableHeaders.length || 1}" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No data to display. Upload a file or adjust your filter/sort criteria.</td></tr>`;
+                itemCountSpan.textContent = '0'; // Update count to 0 if no data
+                return;
+            }
+
+            // Create table headers
+            tableHeaders.forEach(header => {
+                const th = document.createElement('th');
+                th.scope = 'col';
+                th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                th.textContent = header;
+                tableHeaderRow.appendChild(th);
+            });
+
+            // Populate table rows
+            dataToRender.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50'; // Add hover effect
+
+                tableHeaders.forEach(header => {
+                    const cell = document.createElement('td');
+                    cell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
+                    let cellContent = item[header];
+
+                    // Handle different data types for display
+                    if (typeof cellContent === 'object' && cellContent !== null) {
+                        cell.textContent = JSON.stringify(cellContent); // Stringify objects/arrays for display
+                    } else if (cellContent === undefined || cellContent === null) {
+                        cell.textContent = ''; // Display empty string for undefined/null
+                    } else {
+                        cell.textContent = cellContent;
+                    }
+                    row.appendChild(cell);
+                });
+                jsonTableBody.appendChild(row);
+            });
+            itemCountSpan.textContent = dataToRender.length; // Update count with number of displayed items
+        }
+
+        /**
+         * Applies the selected filters and then sorts the data.
+         * This function is called whenever data is loaded or when a filter/sort selection changes.
+         */
+        function applyFiltersAndSort() {
+            let filteredData = [...originalData]; // Start with original data for filtering
+
+            // Apply 'Specialized' filter
+            const specializedFilter = specializedFilterSelect.value;
+            if (specializedFilter === 'exclude') {
+                filteredData = filteredData.filter(item => !(item.specialized === true));
+            } else if (specializedFilter === 'includeOnly') {
+                filteredData = filteredData.filter(item => item.specialized === true);
+            }
+
+            // Apply 'Preprints' filter
+            const preprintsFilter = preprintsFilterSelect.value;
+            if (preprintsFilter === 'exclude') {
+                filteredData = filteredData.filter(item => !(item.preprint === true));
+            } else if (preprintsFilter === 'includeOnly') {
+                filteredData = filteredData.filter(item => item.preprint === true);
+            }
+
+            // Apply 'Abstract' filter
+            const abstractFilter = abstractFilterSelect.value;
+            if (abstractFilter === 'includeOnlyPresent') {
+                // Only include items that have the 'abstract' property
+                filteredData = filteredData.filter(item => item.hasOwnProperty('abstract'));
+            } else if (abstractFilter === 'excludePresent') {
+                // Exclude items that have the 'abstract' property
+                filteredData = filteredData.filter(item => !item.hasOwnProperty('abstract'));
+            }
+
+            currentData = filteredData; // Update currentData with the filtered set
+
+            // Apply sort after filtering
+            const sortBy = sortSelect.value;
+            if (sortBy) {
+                currentData.sort((a, b) => {
+                    const valA = a[sortBy];
+                    const valB = b[sortBy];
+
+                    // Handle null/undefined values for sorting
+                    if (valA === undefined || valA === null) return 1; // Undefined/null values go to the end
+                    if (valB === undefined || valB === null) return -1; // Undefined/null values go to the end
+
+                    // Numeric comparison (descending)
+                    if (typeof valA === 'number' && typeof valB === 'number') {
+                        return valB - valA; // Changed for high to low
+                    }
+                    // String comparison (descending - localeCompare returns negative if a < b, positive if a > b)
+                    if (typeof valA === 'string' && typeof valB === 'string') {
+                        return valB.localeCompare(valA); // Changed for high to low
+                    }
+                    // Fallback for other types (e.g., boolean, objects - convert to string, then descending)
+                    return String(valB).localeCompare(String(valA)); // Changed for high to low
+                });
+            }
+            renderTable(currentData);
+        }
+
+        // Event listeners for the filter dropdowns
+        specializedFilterSelect.addEventListener('change', applyFiltersAndSort);
+        preprintsFilterSelect.addEventListener('change', applyFiltersAndSort);
+        abstractFilterSelect.addEventListener('change', applyFiltersAndSort);
+
+        /**
+         * Event listener for sort dropdown change.
+         */
+        sortSelect.addEventListener('change', applyFiltersAndSort);
+
+
+        /**
+         * Downloads the current filtered/sorted JSON data as a file.
+         */
+        downloadBtn.addEventListener('click', () => {
+            if (currentData.length === 0) {
+                // In a real app, you'd use a custom modal instead of alert
+                alert('No data to download. Please upload a file and ensure there are items after applying filters.');
+                return;
+            }
+
+            const jsonString = JSON.stringify(currentData, null, 2); // Pretty print JSON
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'modified_data.json';
+            document.body.appendChild(a); // Append to body is necessary for Firefox
+            a.click();
+            document.body.removeChild(a); // Clean up
+            URL.revokeObjectURL(url); // Release the object URL
+        });
+
+        // Initial state setup
+        resetAppState();
+    </script>
+</body>
+</html>
