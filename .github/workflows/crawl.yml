@@ -51,10 +51,10 @@ jobs:
         working-directory: ./main_folder
         run: python rank.py
 
-      # - name: Post to Slack
-      #   working-directory: ./main_folder
-      #   run: |
-      #     Rscript post_to_slack.R
+      - name: Post to Slack
+        working-directory: ./main_folder
+        run: |
+          Rscript post_to_slack.R
 
       - name: Commit results main branch 
         working-directory: ./main_folder
