@@ -180,7 +180,8 @@ all_papers_to_slack <- function(papers, wait_in_seconds = 2, rate_limit_per_minu
     start_time <- Sys.time()
 
     N <- nrow(papers)
-
+    if(N==0) return(NULL)
+    
     for (i in 1:N) {
         cat(".")
         paper <- as.vector(papers[i, ])

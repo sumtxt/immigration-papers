@@ -11,7 +11,7 @@ with open("./output/papers.json", "r") as f:
 # Add probabilities
 for paper in papers:
     input_text = f"TITLE: {paper.get('title', '')} \nABSTRACT: {paper.get('abstract', '')}"
-    paper['dist'] = model.predict_proba([input_text])[0][0].item() 
+    paper['score'] = model.predict_proba([input_text])[0][0].item()
 
 # Save the updated papers data
 with open("./output/papers.json", "w") as f:
