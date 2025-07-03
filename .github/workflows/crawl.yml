@@ -50,10 +50,10 @@ jobs:
       - name: Run inference script
         run: python inference.py
 
-      - name: Post to Slack
-        working-directory: ./main_folder
-        run: |
-          Rscript post_to_slack.R
+      # - name: Post to Slack
+      #   working-directory: ./main_folder
+      #   run: |
+      #     Rscript post_to_slack.R
 
       - name: Commit results main branch 
         working-directory: ./main_folder
