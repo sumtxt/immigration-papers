@@ -2,7 +2,7 @@ import json
 from setfit import SetFitModel
 
 # Load the pre-trained model
-model = SetFitModel.from_pretrained("mmarbach/paraphrase-MiniLM-L3-v2_immig")
+model = SetFitModel.from_pretrained("sumtxt/paraphrase-MiniLM-L3-v2_immig")
 
 # Load the papers data
 with open("./output/papers.json", "r") as f:
