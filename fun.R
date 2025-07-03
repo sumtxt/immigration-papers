@@ -160,57 +160,6 @@ check_update_date <- function(update_date){
 }
 
 
-
-##############
-##############
-# Embeddings #
-##############
-##############
-
-# Open AI
-get_openai_embedding <- function(input,
-                                 encoding_format = "float",
-                                 model = "text-embedding-3-large") {
-    endpoint <- "https://api.openai.com/v1/embeddings"
-    body <- list(
-        model = model,
-        encoding_format = "float",
-        input = input
-    )
-    body <- toJSON(body, auto_unbox = TRUE)
-    res <- RETRY("POST",
-        url=endpoint, 
-        body = body,
-        encode = "raw",
-        content_type_json(),
-        add_headers(Authorization = paste("Bearer", openai_apikey, sep = " ")),
-        pause_base=5)
-
-    res <- content(res)
-    return(unlist(res$data[[1]]$embedding))
-}
-
-add_openai_embedding <- function(data) {
-    str <- paste0(data$title, "\n", ifelse(is.na(data$abstract), "", data$abstract))
-    data$vec <- lapply(str, function(x) get_openai_embedding(x))
-    return(data)
-    }
-
-add_yardstick_distance <- function(data, yardstick_file = "./parameters/yardstick.json") {
-    yardstick <- fromJSON(yardstick_file)
-    yardstick <- rbind(yardstick, colMeans(yardstick))
-    data$dist <- get_cosine(data$vec, yardstick)
-    return(data)
-    }
-
-max_cosine <- function(vector, matrix){
-    max(apply(matrix, 1, function(x) cosine(x, vector)))
-}
-
-get_cosine <- function(list_of_vectors, matrix){ 
-    unlist(lapply(list_of_vectors, function(x) max_cosine(x, matrix)))
-}
-
 #################
 #################
 # Post to Slack #

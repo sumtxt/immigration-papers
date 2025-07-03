@@ -18,7 +18,6 @@ jobs:
           packages: |
             any::httr 
             any::jsonlite 
-            any::coop
 
       - name: Check out repository
         uses: actions/checkout@v4
@@ -29,17 +28,32 @@ jobs:
       - name: Create and populate credentials file with secrets
         working-directory: ./main_folder
         run: |
-          echo 'openai_apikey="'"$MAPPED_OPENAI_APIKEY"'"' >> credentials.R
           echo '.slack_workflow_trigger_url="'"$MAPPED_SLACK_WEBHOOK"'"' >> credentials.R
         shell: bash
         env:
-          MAPPED_OPENAI_APIKEY : ${{ secrets.OPENAI_APIKEY }}
           MAPPED_SLACK_WEBHOOK : ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Get data and produce JSON
         working-directory: ./main_folder
         run: |
           Rscript crawl.R
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install setfit
+
+      - name: Run inference script
+        run: python inference.py
+
+      - name: Post to Slack
+        working-directory: ./main_folder
+        run: |
+          Rscript post_to_slack.R
 
       - name: Commit results main branch 
         working-directory: ./main_folder
@@ -48,3 +62,5 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add . && git commit -m "Data updated"
           git push origin
+
+

@@ -1,9 +1,7 @@
 library(httr)
 library(jsonlite)
-library(coop)
 
 source("fun.R")
-source("credentials.R")
 
 s <- NULL
 
@@ -13,9 +11,7 @@ check_update_date(update_date)
 journal_count <- get_paper_picnic_journal_count()
 
 # Crawl Paper Picnic 
-pubs <- get_paper_picnic(sample=s)$content |> 
-    add_openai_embedding() |> 
-    add_yardstick_distance()
+pubs <- get_paper_picnic(sample=s)$content 
 
 pubs$specialized <- (pubs$file=="migration.json")
 pubs$preprint <- FALSE
@@ -27,9 +23,7 @@ pubs <- within(pubs, {
 })
 
 # Crawl Preprint Picnic  
-preprints <- get_preprint_picnic(sample=s)$content |> 
-    add_openai_embedding() |> 
-    add_yardstick_distance()
+preprints <- get_preprint_picnic(sample=s)$content 
 
 preprints$specialized <- FALSE
 preprints$preprint <- TRUE
@@ -49,9 +43,3 @@ write(toJSON(papers), file="./output/papers.json")
 
 meta <- list(update_date=update_date, journal_count=journal_count)
 write(toJSON(meta,auto_unbox=TRUE), file="./output/meta.json")
-
-# Post Top 10 to Slack 
-papers <- papers[order(-1*papers$dist),]
-papers <- subset(papers, specialized==FALSE & preprint==FALSE, select=c("title", "authors", "abstract", "url"))
-papers <- papers[1:10,]
-all_papers_to_slack(papers)
