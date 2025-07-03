@@ -6,3 +6,5 @@ vendor
 .DS_Store
 credentials.R
 ToDo.txt
+.python-version
+.venv

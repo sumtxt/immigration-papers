@@ -16,8 +16,8 @@
             <div class="card" id="article-card">
                 <div class="card-body">
                 <h5 class="card-title">{{ article.title }}
-                    {% if article.dist != nil %}
-                    <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-secondary">{{ article.dist  | times: 100 | round: 1 }}</span>
+                    {% if article.prob != nil %}
+                    <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-secondary">{{ article.prob  | times: 100 | round: 1 }}</span>
                     {% endif %}
                 </h5>
                 <h6 class="card-subtitle mb-2 text-muted">{{ article.authors }}</h6>
