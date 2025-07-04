@@ -15,4 +15,4 @@ for paper in papers:
 
 # Save the updated papers data
 with open("./output/papers.json", "w") as f:
-    json.dump(papers, f, indent=None)
+    json.dump(papers, f, indent=None, ensure_ascii=False)
