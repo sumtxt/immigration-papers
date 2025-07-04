@@ -9,5 +9,3 @@ exclude:
   - "Gemfile"
   - "Gemfile.lock"
   - credentials.R
-
-
