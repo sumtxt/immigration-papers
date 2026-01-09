@@ -150,9 +150,6 @@ get_paper_picnic_journal_count <- function(){
 
 check_update_date <- function(update_date){
 
-    if(length(update_date) != 1){
-        stop("Update date is not the same for all files")
-    }
     if(update_date != Sys.Date()){
         stop("Update date is not today")
     }
