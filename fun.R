@@ -52,6 +52,7 @@ get_paper_picnic <- function(exclude = NULL, include = NULL, sample=NULL) {
         data <- data$content
 
         N_articles <- lapply(data$articles, nrow)
+        if(length(N_articles) ==0) next 
 
         articles <- data$articles[N_articles != 0]
         journal_full <- data$journal_full[N_articles != 0]
