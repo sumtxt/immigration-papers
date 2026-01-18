@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import time
 from datetime import date
@@ -6,8 +7,6 @@ from datetime import date
 import pandas as pd
 import requests
 from setfit import SetFitModel
-
-from credentials import SLACK_WORKFLOW_TRIGGER_URL
 
 BASE_URL = "https://beta.paper-picnic.com/data/"
 
@@ -113,8 +112,11 @@ def post_to_slack(papers: list[dict]):
 
 
 def _paper_to_slack(paper: dict) -> requests.Response:
+    slack_url = os.environ.get("SLACK_WEBHOOK_URL")
+    if not slack_url:
+        raise RuntimeError("SLACK_WEBHOOK_URL environment variable not set")
     response = requests.post(
-        url=SLACK_WORKFLOW_TRIGGER_URL,
+        url=slack_url,
         json=paper,
         headers={"Content-Type": "application/json"},
     )

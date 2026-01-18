@@ -23,16 +23,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r main_folder/requirements.txt
 
-      - name: Create credentials file
-        working-directory: ./main_folder
-        run: |
-          echo 'SLACK_WORKFLOW_TRIGGER_URL = "'"$MAPPED_SLACK_WEBHOOK"'"' > credentials.py
-        env:
-          MAPPED_SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-
       - name: Run pipeline
         working-directory: ./main_folder
         run: python main.py --force
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Commit results main branch
         working-directory: ./main_folder
