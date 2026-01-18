@@ -32,7 +32,7 @@ jobs:
 
       - name: Run pipeline
         working-directory: ./main_folder
-        run: python main.py
+        run: python main.py --force
 
       - name: Commit results main branch
         working-directory: ./main_folder
