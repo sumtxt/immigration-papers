@@ -1,7 +1,8 @@
 .DS_Store
-credentials.R
+credentials.py
 _site
 ToDo.txt
 .venv
 .python-version
 checkpoints
+__pycache__
