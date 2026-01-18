@@ -4,8 +4,9 @@ _site
 .jekyll-metadata
 vendor
 .DS_Store
-credentials.R
+credentials.py
 ToDo.txt
 .python-version
 .venv
 checkpoints
+__pycache__
