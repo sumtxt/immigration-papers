@@ -25,7 +25,7 @@ jobs:
 
       - name: Run pipeline
         working-directory: ./main_folder
-        run: python main.py --force
+        run: python main.py --slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
