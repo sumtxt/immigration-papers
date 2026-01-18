@@ -1,30 +1,55 @@
 import argparse
-import subprocess
-import sys
 
-
-def run_script(script: str):
-    print(f"Running {script}...")
-    result = subprocess.run([sys.executable, script], check=True)
-    return result.returncode
+from pipeline import (
+    fetch_data,
+    is_updated_today,
+    crawl,
+    rank,
+    post_to_slack,
+    save_output,
+)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Run the immigration papers pipeline")
     parser.add_argument(
-        "--no-slack",
+        "--slack",
         action="store_true",
-        help="Skip posting to Slack",
+        help="Post to Slack after ranking",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Run even if data was not updated today",
     )
     args = parser.parse_args()
 
-    run_script("crawl.py")
-    run_script("rank.py")
+    # Fetch data once
+    print("Fetching data...")
+    journals, publications, preprints = fetch_data()
 
-    if not args.no_slack:
-        run_script("post_to_slack.py")
-    else:
-        print("Skipping post_to_slack.py")
+    # Check update date
+    if not args.force and not is_updated_today(publications):
+        print("Data was not updated today. Skipping pipeline. Use --force to override.")
+        return
+
+    # Crawl
+    print("Processing papers...")
+    papers, meta = crawl(journals, publications, preprints)
+    papers = papers.to_dict(orient="records")
+
+    # Rank
+    print("Ranking papers...")
+    papers = rank(papers)
+
+    # Save
+    print("Saving output...")
+    save_output(papers, meta)
+
+    # Post to Slack
+    if args.slack:
+        print("Posting to Slack...")
+        post_to_slack(papers)
 
     print("Done.")
 
