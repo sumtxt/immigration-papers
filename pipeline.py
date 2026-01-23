@@ -104,7 +104,7 @@ def rank(papers: list[dict]) -> list[dict]:
 
 def post_to_slack(papers: list[dict]):
     """Post high-scoring papers to Slack."""
-    df = pd.DataFrame(papers)
+    df = pd.DataFrame(papers).fillna("")
     df = df[(df["score"] >= 0.5) & ~df["specialized"]]
 
     _all_papers_to_slack(df[~df["preprint"]])
