@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 from setfit import SetFitModel
 
-BASE_URL = "https://beta.paper-picnic.com/data/"
+BASE_URL = "https://paper-picnic.com/data/"
 
 
 def extract_doi_id(url: str) -> str:
