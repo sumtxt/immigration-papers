@@ -1,5 +1,10 @@
 # Immigration Papers
 
+### Version 2.1.1 (2026-03-28)
+
+* bug fixed: remove filtered papers
+* updated README
+
 ### Version 2.1.0 (2026-01-18)
 
 * Refactored all code to Python
