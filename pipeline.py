@@ -51,8 +51,7 @@ def crawl(journals: list, publications: dict, preprints_data: dict) -> tuple[pd.
         journal_name = journal.get("journal_name", journal_lookup.get(journal_id, ""))
         is_specialized = journal_category_lookup.get(journal_id, "") == "Migration Studies"
 
-        for article_list in [journal.get("articles", []), journal.get("articles_hidden", [])]:
-            for art in article_list:
+        for art in journal.get("articles", []):
                 pubs_list.append({
                     "title": art.get("title"),
                     "authors": art.get("authors"),
