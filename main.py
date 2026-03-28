@@ -1,4 +1,4 @@
-import argparse
+import os
 
 from pipeline import (
     fetch_data,
@@ -10,26 +10,21 @@ from pipeline import (
 )
 
 
+def env_bool(name: str, default: bool = False) -> bool:
+    """Read a boolean from environment variable."""
+    return os.environ.get(name, "").lower() in ("true", "1", "yes")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Run the immigration papers pipeline")
-    parser.add_argument(
-        "--slack",
-        action="store_true",
-        help="Post to Slack after ranking",
-    )
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Run even if data was not updated today",
-    )
-    args = parser.parse_args()
+    slack = env_bool("PIPELINE_SLACK")
+    force = env_bool("PIPELINE_FORCE")
 
     # Fetch data once
     print("Fetching data...")
     journals, publications, preprints = fetch_data()
 
     # Check update date
-    if not args.force and not is_updated_today(publications):
+    if not force and not is_updated_today(publications):
         print("Data was not updated today. Skipping pipeline. Use --force to override.")
         return
 
@@ -47,7 +42,7 @@ def main():
     save_output(papers, meta)
 
     # Post to Slack
-    if args.slack:
+    if slack:
         print("Posting to Slack...")
         post_to_slack(papers)
 

@@ -2,6 +2,15 @@ name: Crawl data
 
 on:
    workflow_dispatch:
+     inputs:
+       slack:
+         description: 'Post results to Slack'
+         type: boolean
+         default: true
+       force:
+         description: 'Force run even if data is not updated'
+         type: boolean
+         default: false
    schedule:
      - cron: "0 5 * * 5"
 
@@ -25,9 +34,11 @@ jobs:
 
       - name: Run pipeline
         working-directory: ./main_folder
-        run: python main.py --slack
+        run: python main.py
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          PIPELINE_SLACK: ${{ github.event.inputs.slack || 'true' }}
+          PIPELINE_FORCE: ${{ github.event.inputs.force || 'false' }}
 
       - name: Commit results main branch
         working-directory: ./main_folder
