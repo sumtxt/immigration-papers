@@ -1,0 +1,29 @@
+name: Testing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          path: main_folder
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r main_folder/requirements.txt
+
+      - name: Run pipeline
+        working-directory: ./main_folder
+        run: python main.py
+        env:
+          PIPELINE_FORCE: 'true'
+          PIPELINE_SLACK: 'false'
